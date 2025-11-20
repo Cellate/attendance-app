@@ -2,7 +2,7 @@
 
 **Attendance Pro** is a lightweight, mobile-first web application designed for teachers and students to take attendance quickly and efficiently. It features a modern "Tinder-style" swipe interface, a classic grid view, and comprehensive reporting tools—all contained in a **single HTML file**.
 
-> **Live Demo:** [Insert your GitHub Pages link here]
+> **Live Demo:** [https://cellate.github.io/attendance-pro/]
 
 ## ✨ Features
 
