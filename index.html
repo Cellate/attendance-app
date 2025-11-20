@@ -35,12 +35,13 @@
         .animate-pop { animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
-<body class="bg-gray-50 h-screen flex flex-col overflow-hidden text-gray-800">
+<!-- FIXED: Changed h-screen to h-[100dvh] for mobile browser compatibility -->
+<body class="bg-gray-50 h-[100dvh] flex flex-col overflow-hidden text-gray-800">
 
 <div id="app" class="flex flex-col h-full w-full max-w-md mx-auto bg-white shadow-2xl relative">
 
     <!-- HEADER -->
-    <header class="bg-indigo-600 text-white p-4 shadow-md z-20 flex justify-between items-center">
+    <header class="bg-indigo-600 text-white p-4 shadow-md z-20 flex justify-between items-center flex-shrink-0">
         <div class="overflow-hidden">
             <h1 class="text-xl font-bold">Attendance</h1>
             <p class="text-xs opacity-80 truncate">{{ currentSubject === 'Custom' ? tempSubject : currentSubject }}</p>
@@ -51,18 +52,17 @@
     </header>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 overflow-y-auto relative bg-gray-50">
+    <!-- FIXED: Added pb-24 to prevent content hiding behind nav bar -->
+    <main class="flex-1 overflow-y-auto relative bg-gray-50 pb-24">
         
         <!-- TAB 1: SERIAL MODE -->
-        <div v-if="activeTab === 'serial'" class="h-full flex flex-col justify-center items-center p-6 relative">
+        <div v-if="activeTab === 'serial'" class="h-full flex flex-col justify-center items-center p-6 relative min-h-[400px]">
             <div class="w-full max-w-xs bg-white rounded-3xl shadow-xl p-8 text-center border border-gray-100 relative overflow-hidden min-h-[300px] flex flex-col justify-center">
                 <div class="mb-2 text-gray-400 text-sm tracking-widest uppercase">Roll Number</div>
-                <!-- Dynamic font size based on length of roll no -->
                 <div :class="['font-black text-gray-800 mb-6 break-words', currentRoll.length > 5 ? 'text-4xl' : 'text-7xl']">
                     {{ currentRoll }}
                 </div>
                 
-                <!-- Status Indicator for current roll -->
                 <div v-if="getStatus(currentRoll) === 'P'" class="absolute top-4 right-4 text-green-600 font-bold">P</div>
                 <div v-if="getStatus(currentRoll) === 'A'" class="absolute top-4 right-4 text-red-600 font-bold">A</div>
 
@@ -87,7 +87,7 @@
 
         <!-- TAB 2: GRID MODE -->
         <div v-if="activeTab === 'grid'" class="p-2 relative min-h-full">
-            <div class="grid grid-cols-5 gap-2 pb-20">
+            <div class="grid grid-cols-5 gap-2">
                 <div v-for="roll in sortedRolls" :key="roll" 
                      @click="toggleStatus(roll)"
                      :class="['h-14 flex items-center justify-center rounded-lg border font-bold text-xs md:text-sm cursor-pointer select-none grid-item shadow-sm p-1 text-center', 
@@ -97,8 +97,9 @@
             </div>
         </div>
 
-        <!-- QUICK ADD FLOATING BUTTON (Visible in Serial & Grid) -->
-        <div v-if="activeTab === 'serial' || activeTab === 'grid'" class="absolute bottom-6 right-6 z-30 animate-pop">
+        <!-- QUICK ADD FLOATING BUTTON -->
+        <!-- FIXED: Moved to bottom-20 to sit ABOVE the nav bar -->
+        <div v-if="activeTab === 'serial' || activeTab === 'grid'" class="absolute bottom-6 right-6 z-30 animate-pop fixed-fab">
             <button @click="openQuickAdd" class="bg-indigo-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 btn-press">
                 <span class="material-icons-round text-3xl">add</span>
             </button>
@@ -109,7 +110,6 @@
             <div class="w-full bg-white p-6 rounded-2xl shadow-lg">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Enter Roll Number</label>
                 <div class="flex gap-2">
-                    <!-- Type Text for Alphanumeric -->
                     <input type="text" v-model="manualInput" @keyup.enter="markManual('P')" class="flex-1 p-3 border border-gray-300 rounded-xl text-lg outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" placeholder="e.g. 2023-C-3">
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-4">
@@ -130,8 +130,7 @@
         </div>
 
         <!-- TAB 4: RESULT / REPORT -->
-        <div v-if="activeTab === 'result'" class="p-4 h-full overflow-y-auto pb-20">
-            <!-- Report Controls -->
+        <div v-if="activeTab === 'result'" class="p-4 h-full">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4 space-y-3">
                 <div>
                     <label class="text-xs font-bold text-gray-500 uppercase">Subject</label>
@@ -156,7 +155,6 @@
                     </div>
                 </div>
 
-                <!-- Temporary Custom Time Selector -->
                 <div v-if="currentTime === 'Custom'" class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 animate-slide-left">
                     <label class="text-xs font-bold text-indigo-800 uppercase mb-1 block">Set Temporary Time</label>
                     <div class="flex gap-2 items-center">
@@ -170,7 +168,6 @@
                     </div>
                 </div>
                 
-                <!-- List Type Toggle -->
                 <div>
                     <label class="text-xs font-bold text-gray-500 uppercase">List Type</label>
                     <div class="flex bg-gray-100 rounded-lg p-1 mt-1">
@@ -180,7 +177,6 @@
                 </div>
             </div>
 
-            <!-- Preview Box -->
             <div class="bg-gray-800 text-gray-200 p-4 rounded-xl font-mono text-sm shadow-lg relative">
                 <button @click="copyToClipboard" class="absolute top-2 right-2 bg-white/10 hover:bg-white/20 p-2 rounded text-white transition">
                     <span class="material-icons-round text-sm">content_copy</span>
@@ -198,7 +194,6 @@
                 </div>
             </div>
             
-            <!-- Reset Button -->
             <button @click="resetAttendance" class="w-full mt-6 py-3 text-red-500 border border-red-200 rounded-xl hover:bg-red-50 font-medium transition">
                 Reset Attendance for New Session
             </button>
@@ -207,7 +202,8 @@
     </main>
 
     <!-- BOTTOM NAVIGATION TAB BAR -->
-    <nav class="bg-white shadow-inner border-t border-gray-100 flex justify-around items-center pb-safe pt-2 h-16 z-10">
+    <!-- FIXED: Absolute positioning ensures it stays at the bottom on Android -->
+    <nav class="bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] border-t border-gray-100 flex justify-around items-center h-16 z-40 absolute bottom-0 w-full max-w-md">
         <button @click="activeTab = 'serial'" :class="['flex flex-col items-center w-full h-full justify-center transition', activeTab === 'serial' ? 'text-indigo-600' : 'text-gray-400']">
             <span class="material-icons-round">swipe</span>
             <span class="text-[10px] font-bold mt-1">Serial</span>
@@ -238,7 +234,7 @@
         </div>
     </div>
 
-    <!-- SETTINGS MODAL (Hamburger) -->
+    <!-- SETTINGS MODAL -->
     <div v-if="showSettings" class="absolute inset-0 bg-black/50 z-50 flex justify-end">
         <div class="bg-white w-4/5 h-full shadow-2xl flex flex-col animate-slide-left">
             <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
@@ -334,27 +330,23 @@
             const manualInput = Vue.ref('');
             const manualLogs = Vue.ref([]);
             
-            // Temporary inputs
             const tempSubject = Vue.ref('');
             const tempStartTime = Vue.ref('09:00');
             const tempEndTime = Vue.ref('10:00');
             
-            // Settings Inputs
             const newSubjectInput = Vue.ref('');
             const newRollInput = Vue.ref('');
             const newTimeStart = Vue.ref('');
             const newTimeEnd = Vue.ref('');
 
-            // Core Data
             const currentSubject = Vue.ref('Basic Surveying');
             const currentDate = Vue.ref(new Date().toISOString().split('T')[0]);
             const currentTime = Vue.ref('9:00 AM - 10:00 AM');
             const serialIndex = Vue.ref(0);
-            const reportType = Vue.ref('A'); // A for Absentees, P for Present
+            const reportType = Vue.ref('A'); 
 
             const toast = reactive({ show: false, message: '' });
 
-            // --- CONSTANTS: User Provided Defaults ---
             const DEFAULT_ROLL_LIST = [
                 "63","66","67","68","69","70","71","73","74","75","76","78","79","80","81","82","83","84","85","86","87",
                 "90","91","92","94","95","96","97","99","100","101","102","103","104","105","106","107","108","109","110",
@@ -374,7 +366,6 @@
                 "3:00 PM - 5:00 PM"
             ];
 
-            // Persistence Structure
             const getInitialSettings = () => ({
                 subjects: [
                     { name: 'Basic Surveying', active: true },
@@ -383,17 +374,13 @@
                     { name: 'Building Construction and Material', active: true },
                     { name: 'Water Resource Engineering', active: true }
                 ],
-                // Convert string array to object array
                 allRolls: DEFAULT_ROLL_LIST.map(r => ({ val: r, active: true })),
                 timeSlots: [...DEFAULT_TIME_SLOTS]
             });
 
             const settings = reactive(JSON.parse(localStorage.getItem('attendanceSettings')) || getInitialSettings());
-            
-            // Map: Roll (string) -> Status ('P', 'A', null)
             const attendanceData = reactive({});
 
-            // --- Helpers ---
             const format12Hour = (time24) => {
                 if (!time24) return "";
                 const [hours, minutes] = time24.split(':');
@@ -401,22 +388,16 @@
                 const ampm = h >= 12 ? 'PM' : 'AM';
                 h = h % 12;
                 h = h ? h : 12; 
-                return `${h}:${minutes} ${ampm}`; // Removed leading zero padding on hour to match requested format
+                return `${h}:${minutes} ${ampm}`; 
             };
 
-            // --- Computed ---
-            const availableSubjects = computed(() => {
-                return settings.subjects.filter(s => s.active).map(s => s.name);
-            });
+            const availableSubjects = computed(() => settings.subjects.filter(s => s.active).map(s => s.name));
 
             const sortedRolls = computed(() => {
                 return settings.allRolls
                     .filter(r => r.active)
                     .map(r => r.val)
-                    // Natural Sort Algorithm (handles Numbers vs Strings vs Mixed)
-                    .sort((a, b) => {
-                        return a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' });
-                    });
+                    .sort((a, b) => a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' }));
             });
 
             const currentRoll = computed(() => {
@@ -424,28 +405,19 @@
                 return sortedRolls.value[serialIndex.value] || sortedRolls.value[sortedRolls.value.length -1];
             });
 
-            const displaySubject = computed(() => {
-                return currentSubject.value === 'Custom' ? tempSubject.value : currentSubject.value;
-            });
+            const displaySubject = computed(() => currentSubject.value === 'Custom' ? tempSubject.value : currentSubject.value);
 
             const displayTime = computed(() => {
-                if (currentTime.value === 'Custom') {
-                    return `${format12Hour(tempStartTime.value)} - ${format12Hour(tempEndTime.value)}`;
-                }
+                if (currentTime.value === 'Custom') return `${format12Hour(tempStartTime.value)} - ${format12Hour(tempEndTime.value)}`;
                 return currentTime.value;
             });
 
             const generatedList = computed(() => {
                 const targetStatus = reportType.value;
-                const list = sortedRolls.value.filter(r => {
-                    const status = attendanceData[r];
-                    return status === targetStatus;
-                });
+                const list = sortedRolls.value.filter(r => attendanceData[r] === targetStatus);
                 if (list.length === 0) return "None";
                 return list.join(', ');
             });
-
-            // --- Actions ---
 
             const showToast = (msg) => {
                 toast.message = msg;
@@ -483,15 +455,11 @@
             };
 
             const nextSerial = () => {
-                if (serialIndex.value < sortedRolls.value.length - 1) {
-                    serialIndex.value++;
-                }
+                if (serialIndex.value < sortedRolls.value.length - 1) serialIndex.value++;
             };
 
             const prevSerial = () => {
-                if (serialIndex.value > 0) {
-                    serialIndex.value--;
-                }
+                if (serialIndex.value > 0) serialIndex.value--;
             };
 
             const copyToClipboard = () => {
@@ -508,8 +476,6 @@
                     showToast('Session Reset');
                 }
             };
-
-            // --- Settings Management ---
             
             const addSubject = () => {
                 if (newSubjectInput.value) {
@@ -539,12 +505,9 @@
 
             const addRoll = () => {
                 const val = newRollInput.value.trim();
-                if(addRollLogic(val)) {
-                    newRollInput.value = '';
-                }
+                if(addRollLogic(val)) newRollInput.value = '';
             };
 
-            // Quick Add Logic
             const openQuickAdd = () => {
                 quickAddInput.value = '';
                 showQuickAdd.value = true;
@@ -576,7 +539,7 @@
             }
             
             const restoreDefaults = () => {
-                if(confirm("This will reset all custom settings (Subjects, Rolls, Times) to factory default. Are you sure?")) {
+                if(confirm("Reset all settings to factory defaults?")) {
                     Object.assign(settings, getInitialSettings());
                     saveSettings();
                     showToast("Settings Restored");
@@ -584,31 +547,18 @@
                 }
             }
 
-            const getCount = (type) => {
-                 return sortedRolls.value.filter(r => attendanceData[r] === type).length;
-            }
+            const getCount = (type) => sortedRolls.value.filter(r => attendanceData[r] === type).length;
 
-            // --- Persistence Logic ---
-            const saveSettings = () => {
-                localStorage.setItem('attendanceSettings', JSON.stringify(settings));
-            };
-
-            const saveSession = () => {
-                localStorage.setItem('attendanceSession', JSON.stringify(attendanceData));
-            };
+            const saveSettings = () => localStorage.setItem('attendanceSettings', JSON.stringify(settings));
+            const saveSession = () => localStorage.setItem('attendanceSession', JSON.stringify(attendanceData));
 
             onMounted(() => {
                 const savedSession = localStorage.getItem('attendanceSession');
-                if (savedSession) {
-                    Object.assign(attendanceData, JSON.parse(savedSession));
-                }
-                // Ensure default time is set
+                if (savedSession) Object.assign(attendanceData, JSON.parse(savedSession));
                 if(settings.timeSlots.length > 0) currentTime.value = settings.timeSlots[0];
             });
 
-            watch(settings, () => {
-                saveSettings();
-            }, { deep: true });
+            watch(settings, () => saveSettings(), { deep: true });
 
             return {
                 activeTab, showSettings, settings, attendanceData,
@@ -619,7 +569,6 @@
                 newSubjectInput, newRollInput, 
                 newTimeStart, newTimeEnd, tempStartTime, tempEndTime,
                 showQuickAdd, quickAddInput,
-                // Functions
                 getStatus, toggleStatus, markSerial, markManual,
                 nextSerial, prevSerial, copyToClipboard, resetAttendance,
                 addSubject, removeSubject, addRoll, addTime, removeTime, getCount, restoreDefaults,
@@ -628,6 +577,5 @@
         }
     }).mount('#app');
 </script>
-
 </body>
 </html>
